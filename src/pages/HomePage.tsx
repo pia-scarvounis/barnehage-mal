@@ -1,5 +1,6 @@
+import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Clock, MapPin, Utensils, Globe, TreePine, Palette, Heart } from 'lucide-react'
+import { ArrowRight, Clock, MapPin, Utensils, Globe, TreePine, Palette, Heart, ChevronLeft, ChevronRight, Phone, Mail, Users, CalendarDays, Banknote } from 'lucide-react'
 import type { Translation } from '../types'
 import { barnehage } from '../config/barnehage'
 
@@ -20,6 +21,10 @@ const chipIcons = [Globe, TreePine, Palette, Heart]
 export default function HomePage({ t }: Props) {
   const totalBarn = barnehage.avdelinger.reduce((a, b) => a + b.antallBarn, 0)
   const valuesImages = [img6, img5, img7, img1]
+  const galleryRef = useRef<HTMLDivElement>(null)
+  const scrollGallery = (dir: 'left' | 'right') => {
+    galleryRef.current?.scrollBy({ left: dir === 'right' ? 320 : -320, behavior: 'smooth' })
+  }
 
   return (
     <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
@@ -46,17 +51,6 @@ export default function HomePage({ t }: Props) {
                 </a>
                 <Link to="/om-oss" className="btn-secondary">{t.hero.learnMore}</Link>
               </div>
-              <div className="stats-row">
-                {[
-                  { num: totalBarn, label: t.hero.stats.children },
-                  { num: barnehage.avdelinger.length, label: t.hero.stats.departments },
-                ].map(s => (
-                  <div key={s.label}>
-                    <div className="stat-num">{s.num}</div>
-                    <div className="stat-label">{s.label}</div>
-                  </div>
-                ))}
-              </div>
             </div>
 
             {/* Photo collage — hidden on small screens */}
@@ -75,10 +69,6 @@ export default function HomePage({ t }: Props) {
               </div>
             </div>
 
-            {/* Mobile: single full-width image */}
-            <div className="hero-img-mobile">
-              <img src={img7} alt="" style={{ width: '100%', height: '260px', objectFit: 'cover', borderRadius: '24px' }} />
-            </div>
           </div>
         </div>
 
@@ -89,14 +79,31 @@ export default function HomePage({ t }: Props) {
         </div>
       </section>
 
-      {/* ── INFO STRIP ── */}
-      <div style={{ backgroundColor: '#fff', borderBottom: '1.5px solid #F5EDE3' }}>
-        <div className="container" style={{ paddingTop: '14px', paddingBottom: '14px' }}>
-          <div className="info-strip">
-            <div className="info-item"><Clock size={14} style={{ color: '#F07C3E' }} /><span>{t.parents.hours.openText} {barnehage.aapningstider.alle}</span></div>
-            <div className="info-item"><MapPin size={14} style={{ color: '#F07C3E' }} /><span>{barnehage.adresser.map(a => a.gate).join(' · ')}</span></div>
-            <div className="info-item"><Utensils size={14} style={{ color: '#F07C3E' }} /><span>{t.parents.food.hotDays}</span></div>
-          </div>
+      {/* ── INFO STRIP (marquee) ── */}
+      <div style={{ backgroundColor: '#fff', borderBottom: '1.5px solid #F5EDE3', overflow: 'hidden', paddingTop: '12px', paddingBottom: '12px' }}>
+        <div className="marquee-track">
+          {[0, 1].map(copy => (
+            <div key={copy} className="marquee-row" aria-hidden={copy === 1}>
+              <div className="info-item"><Clock size={14} style={{ color: '#F07C3E' }} /><span>{t.parents.hours.openText} {barnehage.aapningstider.alle}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><MapPin size={14} style={{ color: '#F07C3E' }} /><span>{barnehage.adresser.map(a => a.gate).join(' · ')}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><Utensils size={14} style={{ color: '#F07C3E' }} /><span>{t.parents.food.hotDays}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><Users size={14} style={{ color: '#F07C3E' }} /><span>{totalBarn} {t.hero.stats.children.toLowerCase()}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><CalendarDays size={14} style={{ color: '#F07C3E' }} /><span>{t.home.since} {barnehage.etablert}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><TreePine size={14} style={{ color: '#F07C3E' }} /><span>{t.departments.outings}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><Banknote size={14} style={{ color: '#F07C3E' }} /><span>{t.parents.food.cost}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><Phone size={14} style={{ color: '#F07C3E' }} /><span>{barnehage.telefon}</span></div>
+              <span className="marquee-dot" />
+              <div className="info-item"><Mail size={14} style={{ color: '#F07C3E' }} /><span>{barnehage.epost}</span></div>
+              <span className="marquee-dot" />
+            </div>
+          ))}
         </div>
       </div>
 
@@ -173,12 +180,20 @@ export default function HomePage({ t }: Props) {
         <div className="container" style={{ marginBottom: '32px' }}>
           <h2 className="section-h2">{t.gallery.title}</h2>
         </div>
-        <div className="gallery-strip">
-          {[img5, img4, img6, img8, img2, img3].map((src, i) => (
-            <div key={i} className="gallery-item" style={{ width: i % 3 === 0 ? '300px' : '220px' }}>
-              <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-          ))}
+        <div className="gallery-wrapper">
+          <button className="gallery-arrow gallery-arrow-left" onClick={() => scrollGallery('left')} aria-label="Forrige">
+            <ChevronLeft size={22} />
+          </button>
+          <div className="gallery-strip" ref={galleryRef}>
+            {[img5, img4, img6, img8, img2, img3].map((src, i) => (
+              <div key={i} className="gallery-item" style={{ width: i % 3 === 0 ? '300px' : '220px' }}>
+                <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            ))}
+          </div>
+          <button className="gallery-arrow gallery-arrow-right" onClick={() => scrollGallery('right')} aria-label="Neste">
+            <ChevronRight size={22} />
+          </button>
         </div>
       </section>
 
@@ -242,10 +257,13 @@ export default function HomePage({ t }: Props) {
         .stat-num { font-family: 'Nunito', sans-serif; font-size: 2.2rem; font-weight: 900; color: #F07C3E; line-height: 1; }
         .stat-label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; font-weight: 600; }
         .hero-collage { position: relative; height: 500px; }
-        .hero-img-mobile { display: none; }
 
-        /* ── Info strip ── */
-        .info-strip { display: flex; flex-wrap: wrap; gap: 20px; }
+        /* ── Info strip marquee ── */
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .marquee-track { display: flex; width: max-content; animation: marquee 18s linear infinite; }
+        .marquee-track:hover { animation-play-state: paused; }
+        .marquee-row { display: flex; align-items: center; gap: 28px; padding-right: 28px; white-space: nowrap; }
+        .marquee-dot { width: 4px; height: 4px; border-radius: 50%; background: #F07C3E; opacity: 0.4; flex-shrink: 0; }
         .info-item { display: flex; align-items: center; gap: 7px; font-size: 13px; color: #555; font-weight: 500; }
 
         /* ── About ── */
@@ -262,8 +280,14 @@ export default function HomePage({ t }: Props) {
         .tag-chip { font-size: 12px; font-weight: 600; background: #FFF3D6; color: #B8610A; padding: 4px 12px; border-radius: 40px; border: 1px solid #FFD580; }
 
         /* ── Gallery ── */
-        .gallery-strip { display: flex; gap: 14px; padding-left: 20px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: none; }
+        .gallery-wrapper { position: relative; display: flex; align-items: center; }
+        .gallery-strip { display: flex; gap: 14px; padding: 0 20px 6px; overflow-x: auto; scrollbar-width: none; flex: 1; }
+        .gallery-strip::-webkit-scrollbar { display: none; }
         .gallery-item { flex-shrink: 0; height: 260px; border-radius: 20px; overflow: hidden; }
+        .gallery-arrow { position: absolute; z-index: 10; background: #fff; border: 1.5px solid #F5EDE3; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 12px rgba(0,0,0,0.12); color: #333; transition: background 0.18s, color 0.18s, border-color 0.18s; }
+        .gallery-arrow:hover { background: #F07C3E; color: #fff; border-color: #F07C3E; }
+        .gallery-arrow-left { left: 12px; }
+        .gallery-arrow-right { right: 12px; }
 
         /* ── Values ── */
         .values-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
@@ -282,7 +306,6 @@ export default function HomePage({ t }: Props) {
         @media (max-width: 900px) {
           .hero-grid { grid-template-columns: 1fr; gap: 32px; }
           .hero-collage { display: none; }
-          .hero-img-mobile { display: block; }
           .two-col-grid { grid-template-columns: 1fr; gap: 40px; }
           .img-grid-2x2 { grid-template-rows: 180px 180px; }
           .dept-grid { grid-template-columns: 1fr 1fr; }

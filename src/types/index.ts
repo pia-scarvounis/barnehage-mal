@@ -42,6 +42,7 @@ export interface Translation {
     aboutChips: string[]
     ctaTitle: string
     ctaBody: string
+    since: string
   }
   departments: {
     tag: string; title: string; lead: string

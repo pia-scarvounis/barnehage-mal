@@ -54,6 +54,7 @@ const no: Translation = {
     aboutChips: ['Internasjonalt miljø', 'Friluftsliv og natur', 'Kreativitet og kultur', 'Inkludering og omsorg'],
     ctaTitle: 'Klar for å søke plass?',
     ctaBody: 'Søk gjennom kommunens opptakssystem. Vi tar gjerne en prat om du har spørsmål.',
+    since: 'Siden',
   },
   departments: {
     tag: 'Våre avdelinger',

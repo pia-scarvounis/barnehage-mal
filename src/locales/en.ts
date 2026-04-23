@@ -54,6 +54,7 @@ const en: Translation = {
     aboutChips: ['International environment', 'Outdoor life & nature', 'Creativity & culture', 'Inclusion & care'],
     ctaTitle: 'Ready to apply for a place?',
     ctaBody: 'Apply through the municipal admissions system. Feel free to get in touch if you have any questions.',
+    since: 'Since',
   },
   departments: {
     tag: 'Our departments',
